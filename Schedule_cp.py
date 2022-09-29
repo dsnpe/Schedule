@@ -21,11 +21,20 @@
 예외처리는 할 수 있는데까지 해놓기(반에 실수 넣거나 요일에 수 넣거나 등 대비)
 
 '''
-#사용자에게 받는 입력
-Yoil = input('\n시간표를 볼 요일을 적어주세요.\n예)월, 월요일\n')
-cls = int(input('\n시간표를 볼 반을 적어주세요.\n'))
 
-#각 요일에 입력될 값 저장
+#  날짜 모듈
+import datetime
+
+nowtime = datetime.datetime.today()  #  현재 시각
+
+
+#nowtime = datetime.datetime(2022, 9, 29, 17, 50)  #  코드 확인용
+
+TodayDateStr = datetime.datetime.strftime(nowtime, '%Y-%m-%d')  #  오늘 날짜를 '2022-11-17' 꼴로 나타냄
+TodayYoilInt = int(datetime.datetime.strftime(nowtime, '%w'))  #  오늘의 요일을 1~7로 나타냄
+nowtimehour = int(datetime.datetime.strftime(nowtime, '%H'))
+
+#  각 요일에 입력될 값 저장
 Wol = ['월','월요일']
 Hwa = ['화','화요일']
 Su = ['수','수요일']
@@ -33,8 +42,19 @@ Mok = ['목','목요일']
 Geum = ['금','금요일']
 To = ['토','토요일']
 Il = ['일','일요일']
+nextD = {
+    '' : '값을 입력하지 않으',
+    ' ' : '공백을 입력하'
+}
 
-#각 반의 요일별 시간표 리스트
+Week = [Wol,Hwa,Su,Mok,Geum,To,Il]  #  한 주의 요일을 배열로 저장
+TodayYoilStr = Week[TodayYoilInt-1][1]  #  오늘의 요일을 x요일 꼴로 나타냄
+
+#  각 반에 입력될 값 저장 
+ban = ['1반','2반','3반','4반','5반','6반','7반','8반']
+bannum = ['1','2','3','4','5','6','7','8']
+
+#  각 반의 요일별 시간표 리스트
 Wol_sch = [
     '0반 그런건 없다',
     ['체육','정보','화학','영듣','수과탐','심국(이)','진로'],
@@ -95,7 +115,9 @@ Geum_sch = [
     ['정보','영어','심영','심국(황)','생과(이)','고전','한지']
 ]
 
-#날짜별 함수 설정
+Week_sch = [Wol_sch,Hwa_sch,Su_sch,Mok_sch,Geum_sch]
+
+#  날짜별 함수 설정
 def Wol_Sigan(cls) :
     print(str(cls)+'반의',Wol[1],'시간표 출력\n')
     today = Wol_sch[cls]
@@ -109,7 +131,7 @@ def Hwa_Sigan(cls) :
     today = Hwa_sch[cls]
 
     for i in range(0,7) :
-        printstr(i+1)+'교시 :',(today[i])
+        print(str(i+1)+'교시 :',today[i])
         i+=1
 
 def Su_Sigan(cls) :
@@ -136,7 +158,38 @@ def Geum_Sigan(cls) :
         print(str(i+1)+'교시 :',today[i])
         i+=1
 
-#요일별 함수 할당
+
+######  수정 필요  ######
+def Before18pm(cls) :
+    print('아직 18시가 지나지 않았습니다.')
+    print(str(cls)+'반의',Week[TodayYoilInt-1][1],'시간표 출력\n')
+    today = Week_sch[TodayYoilInt-1][cls]
+
+    for i in range(0,7) :
+        print(str(i+1)+'교시 :',today[i])
+        i+=1
+
+def After18pm(cls) :
+    print('18시가 지났습니다.')
+    print(str(cls)+'반의',Week[TodayYoilInt][1],'시간표 출력\n')
+    today = Week_sch[TodayYoilInt][cls]
+
+    for i in range(0,7) :
+        print(str(i+1)+'교시 :',today[i])
+        i+=1
+
+def nextD_Sigan(cls) :
+    if abs(nowtimehour - 7) < 8 :
+        Before18pm(cls)
+
+
+    elif abs(nowtimehour - 7) >= 8 :
+        After18pm(cls)
+######  수정 필요  ######
+
+
+
+#  요일별 함수 할당
 def schedule(Yoil,cls) :
     print('\n')
     if Yoil in Wol :
@@ -154,16 +207,33 @@ def schedule(Yoil,cls) :
     elif Yoil in Geum :
         Geum_Sigan(cls)
 
+    elif Yoil in nextD :
+        print(nextD[Yoil]+'셨습니다.') # 아침 10시와 가장 가까운', Week[TodayYoilInt][1]+'의 시간표가 보여집니다.\n')
+        nextD_Sigan(cls)
+    
     else :
         print('요일을 예시와 같게 입력해주세요.')
     print('\n실행 완료')
 
-#함수 호출
+#  사용자에게 받는 입력
+print('\n시간표를 볼 요일을 적어주세요.\n예)월, 월요일\n오늘은 '+TodayYoilStr+'입니다.')
+Yoil = input('\n공백을 입력하거나 입력하지 않을 시 아침 10시와 가장 가까운 날의 시간표가 보여집니다.\n')
+cls = input('\n시간표를 볼 반을 적어주세요.\n')
 
-'''if cls != 5
- or cls !=6 or cls != 7 :
-    schedule(Yoil,cls)
+
+#  cls의 값을 int로 변환
+if cls in ban :
+    cls = ban.index(cls)-1
+
+elif cls in bannum :
+    cls = int(cls)
+
 else :
-    print(f'{cls}반 데이터가 존재하지 않습니다!')
-'''
+    print('반을 예시와 같게 입력해주세요.')
+
+#  함수 호출
 schedule(Yoil,cls)
+'''
+print('현재 시각 :',nowtime)
+print('오늘 요일 정수 :',TodayYoilInt)
+'''
